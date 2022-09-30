@@ -1,4 +1,4 @@
-import sys, re
+import sys
 
 from parser import Parser
 from complition import Algorithm

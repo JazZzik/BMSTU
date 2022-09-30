@@ -1,5 +1,5 @@
 from curses import raw
-import re, sys
+import re
 from models.term import Term
 from models.trs import Trs
 
