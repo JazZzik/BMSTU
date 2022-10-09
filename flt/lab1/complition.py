@@ -25,10 +25,6 @@ class Algorithm():
             print("Unable to find order")
 
     def knuth_bendix(self, lex: Graph, rules: list[Trs]):
-        print(f"{lex}, {rules}")
-        lex = deepcopy(lex)
-        rules = deepcopy(rules)
-        
         for rule in rules:
             if rule.right_term == rule.left_term:
                 return       
@@ -43,8 +39,9 @@ class Algorithm():
                     print(f"{v} >lg {u}")
             raise Catapult
 
-        rule = rules.pop()
         lex = deepcopy(lex)
+        rules = deepcopy(rules)
+        rule = rules.pop()
 
         if str(rule.left_term) in str(rule.right_term):
             return
@@ -55,7 +52,6 @@ class Algorithm():
             self.kb2(rule, lex, rules)
 
     def kb1(self, rule, lex, rules):
-        print(f"KB1 {rule}")
         lex = deepcopy(lex)
         rules = deepcopy(rules)
         if str(rule.right_term) in str(rule.left_term):
@@ -73,33 +69,24 @@ class Algorithm():
                 self.knuth_bendix(lex, rules_upd)
 
     def kb3(self, rule, lex, rules):
-        print(f"KB3 {rule}")
-        if rule.left_term.ttype != 'constructor' or rule.right_term.ttype != 'constructor':
-            return
-        if rule.left_term.tname == rule.right_term.tname:
-            return
-        lex = deepcopy(lex)
-        rules = deepcopy(rules)
-        lex.add(rule.left_term.tname, rule.right_term.tname)
-        print(lex)
-        for term in rule.right_term.targs:
-            rules.add(Trs(rule.left_term, term))
-        self.knuth_bendix(lex, rules)
+        if rule.left_term.ttype == 'constructor' and rule.right_term.ttype == 'constructor':
+            if rule.left_term.tname != rule.right_term.tname:
+                lex = deepcopy(lex)
+                rules = deepcopy(rules)
+                lex.add(rule.left_term.tname, rule.right_term.tname)
+                for term in rule.right_term.targs:
+                    rules.add(Trs(rule.left_term, term))
+                self.knuth_bendix(lex, rules)
     
     def kb4(self, rule, lex, rules):
-        print(f"KB4 {rule}")
-        if rule.left_term.ttype != 'constructor' or rule.right_term.ttype != 'constructor':
-            return
-        if rule.left_term.tname != rule.right_term.tname:
-            return
-        lex = deepcopy(lex)
-        rules = deepcopy(rules)
-        
-        for term in rule.right_term.targs:
-            rules.add(Trs(rule.left_term, term))
-        
-        for left_term, right_term in [*zip(rule.left_term.targs, rule.right_term.targs)][::self.order]:
-            if left_term != right_term:
-                rules.add(Trs(left_term, right_term))
-                self.knuth_bendix(lex, rules)
-                return
+        if rule.left_term.ttype == 'constructor' and rule.right_term.ttype == 'constructor':
+            if rule.left_term.tname == rule.right_term.tname:
+                lex = deepcopy(lex)
+                rules = deepcopy(rules)
+                for term in rule.right_term.targs:
+                    rules.add(Trs(rule.left_term, term))
+                for left_term, right_term in [*zip(rule.left_term.targs, rule.right_term.targs)][::self.order]:
+                    if left_term != right_term:
+                        rules.add(Trs(left_term, right_term))
+                        self.knuth_bendix(lex, rules)
+                        return
